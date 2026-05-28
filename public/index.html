@@ -1,1 +1,24 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+    <meta charset="UTF-8">
+    <title>ERP System - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Isama ang Supabase CDN para sa Authentication -->
+    <script src="https://jsdelivr.net"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>ERP Inventory Login</h2>
+        <p>Mag-sign in para ma-access ang system</p>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email Address" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Pumasok sa System</button>
+        </form>
+        <p id="errorMsg" style="color: #ef4444; margin-top: 10px;"></p>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
 
