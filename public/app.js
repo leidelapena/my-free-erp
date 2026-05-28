@@ -1,6 +1,6 @@
 // CONFIGURATION: Siguraduhing tama ang iyong mga keys dito
-const SUPABASE_URL = "https://bgvmwfsjsikapooitcgp.supabase.co";
-const SUPABASE_KEY = "sb_publishable_JB_7iuO8hlOPImnwTF-o9Q_DymLpH1N"; // <-- I-paste dito ang iyong anon public key
+const SUPABASE_URL = 'https://bgvmwfsjsikapooitcgp.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_JB_7iuO8hlOPImnwTF-o9Q_DymLpH1N'; // <-- I-paste dito ang iyong anon public key
 
 // LOGIN LOGIC
 const loginForm = document.getElementById('loginForm');
