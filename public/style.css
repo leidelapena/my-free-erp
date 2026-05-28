@@ -1,1 +1,207 @@
+/* --- MODERN EXECUTIVE THEME VARIABLES --- */
+:root {
+    --bg-main: #0b0f19;         /* Deep rich dark background */
+    --bg-card: #151d30;         /* Sleek blue-gray card containers */
+    --bg-input: #1f2a45;        /* Clear dark input backgrounds */
+    --accent-blue: #38bdf8;     /* Cyan/Blue highlight */
+    --accent-green: #10b981;    /* Vibrant emerald for positive values */
+    --text-primary: #f8fafc;    /* Crisp clean white text */
+    --text-muted: #94a3b8;       /* Soft gray for labels and notes */
+    --border-color: #293552;    /* Professional clean borders */
+    --accent-red: #ef4444;      /* Alert red for delete and logout */
+}
+
+/* --- OVERALL APP BODY --- */
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+/* --- SYSTEM FRAME CONTAINER --- */
+.dashboard-container {
+    max-width: 1300px;
+    width: 95%;
+    background: var(--bg-card);
+    padding: 35px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    margin: 40px auto;
+    box-sizing: border-box;
+}
+
+/* --- HEADERS & LOGOUT --- */
+h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+}
+h3 {
+    font-size: 16px;
+    color: var(--accent-blue);
+    margin: 0 0 15px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.logout-btn {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--accent-red);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    float: right;
+    transition: all 0.2s ease;
+}
+.logout-btn:hover {
+    background: var(--accent-red);
+    color: white;
+}
+
+/* --- INTUITIVE GRID FORM LAYOUT --- */
+#productForm {
+    background: rgba(15, 23, 42, 0.4);
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 30px;
+}
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.form-grid label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+input, select {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: #ffffff;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+input:focus, select:focus {
+    border-color: var(--accent-blue);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+/* --- SAVE BUTTON ACTION --- */
+#productForm button[type="submit"] {
+    width: auto;
+    min-width: 200px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+    display: block;
+    margin: 10px 0 0 auto;
+}
+#productForm button[type="submit"]:hover {
+    opacity: 0.95;
+}
+#productForm button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+/* --- RESPONSIVE TABLE GRID SPREADSHEET --- */
+.table-responsive {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    background: rgba(21, 29, 48, 0.6);
+}
+th {
+    background-color: #0f172a;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 16px;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-color);
+}
+td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 14px;
+    color: #e2e8f0;
+}
+tr:hover {
+    background-color: rgba(31, 42, 69, 0.4);
+}
+
+/* --- SPECIAL TABLE HIGHLIGHTS --- */
+.total-cell {
+    font-weight: 700 !important;
+    color: var(--accent-green) !important;
+    background-color: rgba(16, 185, 129, 0.05);
+}
+.category-badge {
+    color: var(--accent-blue);
+    font-weight: 700;
+    font-size: 12px;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* --- UTILITY MESSAGES & DELETE BUTTON --- */
+.empty-msg {
+    text-align: center;
+    padding: 40px !important;
+    color: var(--text-muted);
+    font-style: italic;
+}
+.delete-btn {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--accent-red);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.delete-btn:hover {
+    background: var(--accent-red);
+    color: white;
+}
 
