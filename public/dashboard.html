@@ -1,1 +1,40 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+    <meta charset="UTF-8">
+    <title>ERP - Inventory Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Gagamit ng unpkg para hindi mag-timeout ang database connection -->
+    <script src="https://unpkg.com"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <button class="logout-btn" id="logoutBtn">Log Out</button>
+        <h2>📦 Inventory Management System</h2>
+        <hr style="border-color: var(--border);">
+        
+        <h3>Magdagdag ng Bagong Produkto</h3>
+        <form id="productForm" style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" id="prodName" placeholder="Pangalan ng Item" required>
+            <input type="number" id="prodQty" placeholder="Dami/Stock" required>
+            <button type="submit" style="width: auto; white-space: nowrap;">Save Item</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Pangalan ng Produkto</th>
+                    <th>Kasalukuyang Stock</th>
+                    <th>Aksyon</th>
+                </tr>
+            </thead>
+            <tbody id="inventoryTable">
+                <!-- Dito awtomatikong papasok ang mga produkto gamit ang JS -->
+            </tbody>
+        </table>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
 
