@@ -2,37 +2,98 @@
 <html lang="tl">
 <head>
     <meta charset="UTF-8">
-    <title>ERP - Inventory Dashboard</title>
+    <title>ERP - Advanced Inventory Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Karagdagang mabilisang disenyo para sa malapad na spreadsheet layout */
+        .dashboard-container { max-width: 1200px !important; width: 95% !important; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; text-align: left; }
+        .form-grid label { font-size: 12px; color: #38bdf8; font-weight: bold; }
+        .table-responsive { overflow-x: auto; margin-top: 20px; }
+        table { font-size: 14px; }
+        th { white-space: nowrap; }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
         <button class="logout-btn" id="logoutBtn">Log Out</button>
-        <h2>📦 Inventory Management System</h2>
-        <hr style="border-color: var(--border);">
+        <h2>📊 Advanced Inventory Report System (ERP)</h2>
+        <hr style="border-color: var(--border); margin-bottom: 20px;">
         
-        <h3>Magdagdag ng Bagong Produkto</h3>
-        <form id="productForm" style="display: flex; gap: 10px; align-items: center;">
-            <input type="text" id="prodName" placeholder="Pangalan ng Item" required>
-            <input type="number" id="prodQty" placeholder="Dami/Stock" required>
-            <button type="submit" style="width: auto; white-space: nowrap;">Save Item</button>
+        <h3>➕ Magdagdag / Mag-update ng Stock</h3>
+        <form id="productForm">
+            <div class="form-grid">
+                <div>
+                    <label>Category</label>
+                    <select id="prodCategory" required>
+                        <option value="BEVERAGES">BEVERAGES</option>
+                        <option value="CONDIMENTS">CONDIMENTS</option>
+                        <option value="DAIRY">DAIRY</option>
+                        <option value="DRY GOODS">DRY GOODS</option>
+                        <option value="FISH">FISH</option>
+                        <option value="HALO HALO">HALO HALO</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Product Description</label>
+                    <input type="text" id="prodName" placeholder="Hal: COKE IN CAN" required>
+                </div>
+                <div>
+                    <label>UoM</label>
+                    <input type="text" id="prodUom" placeholder="Hal: CAN, PACK, KILO" required>
+                </div>
+                <div>
+                    <label>Chiller</label>
+                    <input type="number" id="stockChiller" value="0" min="0">
+                </div>
+                <div>
+                    <label>Commissary</label>
+                    <input type="number" id="stockCommissary" value="0" min="0">
+                </div>
+                <div>
+                    <label>Dry Stock Room</label>
+                    <input type="number" id="stockDry" value="0" min="0">
+                </div>
+                <div>
+                    <label>Freezer</label>
+                    <input type="number" id="stockFreezer" value="0" min="0">
+                </div>
+                <div>
+                    <label>Packaging/Supplies</label>
+                    <input type="number" id="stockPackaging" value="0" min="0">
+                </div>
+                <div>
+                    <label>Scrap</label>
+                    <input type="number" id="stockScrap" value="0" min="0">
+                </div>
+            </div>
+            <button type="submit" style="margin-top: 0;">I-save sa Imbentaryo</button>
         </form>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Item ID</th>
-                    <th>Pangalan ng Produkto</th>
-                    <th>Kasalukuyang Stock</th>
-                    <th>Aksyon</th>
-                </tr>
-            </thead>
-            <tbody id="inventoryTable">
-                <!-- Dito awtomatikong papasok ang mga produkto gamit ang JS -->
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Category</th>
+                        <th>Product Description</th>
+                        <th>UoM</th>
+                        <th>Chiller</th>
+                        <th>Commissary</th>
+                        <th>Dry Stock</th>
+                        <th>Freezer</th>
+                        <th>Packaging</th>
+                        <th>Scrap</th>
+                        <th style="color: #38bdf8;">Total Qty</th>
+                        <th>Aksyon</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTable">
+                    <!-- Ang data mula sa Google Sheet style ay papasok dito -->
+                </tbody>
+            </table>
+        </div>
     </div>
     <script src="app.js"></script>
 </body>
 </html>
-
