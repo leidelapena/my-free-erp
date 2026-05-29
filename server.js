@@ -10,8 +10,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 🔑 GOOGLE CONFIGURATION (Ligtas na babasahin mula sa Render Environment Variables)
 const SPREADSHEET_ID = '1nYoKIT4IDUbcojGHi9gqNgBUtpImErXnom80NtlE0fQ';
 const CLIENT_EMAIL = process.env.GOOGLE_CLIENT_EMAIL; 
-const PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY ? process.env.GOOGLE_PRIVATE_KEY.split(String.raw`\n`).join('\n') : undefined;
-
+const PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY ? process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n').replace(/"/g, '') : undefined;
 // Pag-verify kung kumpleto ang mga susi sa server environment bago simulan ang Google Auth
 let auth, sheets;
 try {
