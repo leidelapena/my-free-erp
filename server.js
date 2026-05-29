@@ -7,42 +7,52 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 🔑 GOOGLE CONFIGURATION (Mula sa iyong na-download na JSON key file)
+// 🔑 GOOGLE CONFIGURATION (Ligtas na babasahin mula sa Render Environment Variables)
 const SPREADSHEET_ID = '1nYoKIT4IDUbcojGHi9gqNgBUtpImErXnom80NtlE0fQ';
-const CLIENT_EMAIL = 'erp-service@my-erp-system-497709.iam.gserviceaccount.com'; // <-- I-paste ang email mula sa JSON file
-const PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY ? process.env.GOOGLE_PRIVATE_KEY.split(String.raw`\n`).join('\n') : undefined; // <-- I-paste ang buong private key kasama ang -----BEGIN PRIVATE KEY-----
+const CLIENT_EMAIL = process.env.GOOGLE_CLIENT_EMAIL; 
+const PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY ? process.env.GOOGLE_PRIVATE_KEY.split(String.raw`\n`).join('\n') : undefined;
 
-const auth = new google.auth.JWT(
-    CLIENT_EMAIL,
-    null,
-    PRIVATE_KEY,
-    ['https://googleapis.com']
-);
+// Pag-verify kung kumpleto ang mga susi sa server environment bago simulan ang Google Auth
+let auth, sheets;
+try {
+    if (CLIENT_EMAIL && PRIVATE_KEY) {
+        auth = new google.auth.JWT(
+            CLIENT_EMAIL,
+            null,
+            PRIVATE_KEY,
+            ['https://googleapis.com']
+        );
+        sheets = google.sheets({ version: 'v4', auth });
+    }
+} catch (e) {
+    console.error("Auth Initialization Error:", e.message);
+}
 
-const sheets = google.sheets({ version: 'v4', auth });
-
-// API: Kumuha ng Data mula sa Google Sheet
+// API ROUTE: Kumuha ng Data mula sa Google Sheet
 app.get('/api/inventory', async (req, res) => {
     try {
+        if (!sheets) throw new Error("Google API credentials are not properly configured on Render.");
+        
         const result = await sheets.spreadsheets.values.get({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'Inventory!A2:K', // Binabasa ang Sheet na may pangalang 'Inventory' mula row 2 pababa
+            range: 'Inventory!A2:K', 
         });
         const rows = result.data.values || [];
         res.json(rows);
     } catch (error) {
+        console.error("GET Error:", error.message);
         res.status(500).json({ error: error.message });
     }
 });
 
-// API: Magdagdag ng Bagong Row sa Google Sheet
+// API ROUTE: Magdagdag ng Bagong Row sa Google Sheet
 app.post('/api/inventory', async (req, res) => {
-    const { category, item_name, uom, chiller, commissary, dry_stock, freezer, packaging, scrap } = req.body;
-    
-    // Pagkalkula ng Total Qty sa server-side para sa kaligtasan ng data
-    const totalQty = Number(chiller) + Number(commissary) + Number(dry_stock) + Number(freezer) + Number(packaging) + Number(scrap);
-
     try {
+        if (!sheets) throw new Error("Google API credentials are not properly configured on Render.");
+        
+        const { category, item_name, uom, chiller, commissary, dry_stock, freezer, packaging, scrap } = req.body;
+        const totalQty = Number(chiller) + Number(commissary) + Number(dry_stock) + Number(freezer) + Number(packaging) + Number(scrap);
+
         await sheets.spreadsheets.values.append({
             spreadsheetId: SPREADSHEET_ID,
             range: 'Inventory!A2',
@@ -53,12 +63,13 @@ app.post('/api/inventory', async (req, res) => {
         });
         res.json({ success: true });
     } catch (error) {
+        console.error("POST Error:", error.message);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Mga Pahina
+// Front-end Routing Hooks
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 app.get('/dashboard', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'dashboard.html')); });
 
-app.listen(PORT, () => { console.log(`Server is running on port ${PORT}`); });
+app.listen(PORT, () => { console.log(`Server is running successfully on port ${PORT}`); });
