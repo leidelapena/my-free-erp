@@ -7,21 +7,18 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 🔑 GOOGLE CONFIGURATION (Ligtas na babasahin mula sa Render Environment Variables)
+// 🔑 GOOGLE CONFIGURATION: Direktang babasahin mula sa ginawang local JSON file
 const SPREADSHEET_ID = '1nYoKIT4IDUbcojGHi9gqNgBUtpImErXnom80NtlE0fQ';
-const CLIENT_EMAIL = process.env.GOOGLE_CLIENT_EMAIL; 
-const PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY; // Pag-verify kung kumpleto ang mga susi sa server environment bago simulan ang Google Auth
+const keyPath = path.join(__dirname, 'google-key.json');
+
 let auth, sheets;
 try {
-    if (CLIENT_EMAIL && PRIVATE_KEY) {
-        auth = new google.auth.JWT(
-            CLIENT_EMAIL,
-            null,
-            PRIVATE_KEY,
-            ['https://googleapis.com']
-        );
-        sheets = google.sheets({ version: 'v4', auth });
-    }
+    // Awtomatikong pinoproseso ng Google library ang file kaya walang masisirang keys
+    auth = new google.auth.GoogleAuth({
+        keyFile: keyPath,
+        scopes: ['https://googleapis.com'],
+    });
+    sheets = google.sheets({ version: 'v4', auth });
 } catch (e) {
     console.error("Auth Initialization Error:", e.message);
 }
@@ -29,8 +26,6 @@ try {
 // API ROUTE: Kumuha ng Data mula sa Google Sheet
 app.get('/api/inventory', async (req, res) => {
     try {
-        if (!sheets) throw new Error("Google API credentials are not properly configured on Render.");
-        
         const result = await sheets.spreadsheets.values.get({
             spreadsheetId: SPREADSHEET_ID,
             range: 'Inventory!A2:K', 
@@ -46,8 +41,6 @@ app.get('/api/inventory', async (req, res) => {
 // API ROUTE: Magdagdag ng Bagong Row sa Google Sheet
 app.post('/api/inventory', async (req, res) => {
     try {
-        if (!sheets) throw new Error("Google API credentials are not properly configured on Render.");
-        
         const { category, item_name, uom, chiller, commissary, dry_stock, freezer, packaging, scrap } = req.body;
         const totalQty = Number(chiller) + Number(commissary) + Number(dry_stock) + Number(freezer) + Number(packaging) + Number(scrap);
 
