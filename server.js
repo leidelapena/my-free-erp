@@ -10,7 +10,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 🔑 GOOGLE CONFIGURATION (Mula sa iyong na-download na JSON key file)
 const SPREADSHEET_ID = '1nYoKIT4IDUbcojGHi9gqNgBUtpImErXnom80NtlE0fQ';
 const CLIENT_EMAIL = 'erp-service@my-erp-system-497709.iam.gserviceaccount.com'; // <-- I-paste ang email mula sa JSON file
-const PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY ? process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined; // <-- I-paste ang buong private key kasama ang -----BEGIN PRIVATE KEY-----
+const PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY ? process.env.GOOGLE_PRIVATE_KEY.split(String.raw`\n`).join('\n') : undefined; // <-- I-paste ang buong private key kasama ang -----BEGIN PRIVATE KEY-----
 
 const auth = new google.auth.JWT(
     CLIENT_EMAIL,
