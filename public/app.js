@@ -66,9 +66,19 @@ async function loadInventory() {
         const response = await fetch('/api/inventory');
         const rows = await response.json();
 
+        // ⚠️ PAG-CHECK: Kung may error na binalik ang server, ipakita ang mismong detalye nito
+        if (rows.error) {
+            throw new Error(rows.error);
+        }
+
+        // Siguraduhing listahan (array) ang natanggap bago mag-forEach
+        if (!Array.isArray(rows)) {
+            throw new Error("Maling format ng data ang nakuha mula sa server.");
+        }
+
         inventoryTable.innerHTML = "";
         if (rows.length === 0) {
-            inventoryTable.innerHTML = "<tr><td colspan='12' style='text-align:center;'>Walang laman ang iyong Google Sheet.</td></tr>";
+            inventoryTable.innerHTML = "<tr><td colspan='12' style='text-align:center;'>Walang laman ang iyong Google Sheet. Magsimula gamit ang form sa itaas.</td></tr>";
             return;
         }
 
@@ -90,6 +100,6 @@ async function loadInventory() {
             inventoryTable.innerHTML += tr;
         });
     } catch (error) {
-        inventoryTable.innerHTML = `<tr><td colspan='12' style='color:var(--accent-red);'>Error sa pag-load: ${error.message}</td></tr>`;
+        inventoryTable.innerHTML = `<tr><td colspan='12' style='color:var(--accent-red); text-align:center; font-weight:bold;'>Error sa pag-load: ${error.message}</td></tr>`;
     }
 }
