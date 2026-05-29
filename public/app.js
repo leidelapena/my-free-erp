@@ -63,7 +63,7 @@ async function loadInventory() {
     inventoryTable.innerHTML = "<tr><td colspan='12' style='text-align:center;'>Kinukuha ang pinakabagong ulat mula sa Google Sheets...</td></tr>";
 
     try {
-        const response = await fetch('https://onrender.com');
+        const response = await fetch('/api/inventory');
         const rows = await response.json();
 
         // ⚠️ PAG-CHECK: Kung may error na binalik ang server, ipakita ang mismong detalye nito
