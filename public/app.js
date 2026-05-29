@@ -1,87 +1,52 @@
-// CONFIGURATION: Siguraduhing tama ang iyong mga keys dito
-const SUPABASE_URL = 'https://bgvmwfsjsikapooitcgp.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_JB_7iuO8hlOPImnwTF-o9Q_DymLpH1N'; // <-- I-paste dito ang iyong anon public key
-
-// LOGIN LOGIC
+// LOGIN LOGIC (Pansamantalang simple muna para maka-access agad sa dashboard)
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
+    loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const errorMsg = document.getElementById('errorMsg');
-        errorMsg.innerText = "Nagbe-verify...";
-
-        try {
-            const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-                method: "POST",
-                headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error_description || data.message || "Maling login.");
-
-            localStorage.setItem("erp_session", data.access_token);
-            window.location.href = "/dashboard";
-        } catch (error) {
-            errorMsg.innerText = "Error: " + error.message;
-        }
+        localStorage.setItem("erp_logged_in", "true");
+        window.location.href = "/dashboard";
     });
 }
 
 // DASHBOARD LOGIC
 const inventoryTable = document.getElementById('inventoryTable');
 if (inventoryTable) {
-    checkUser();
+    if (localStorage.getItem("erp_logged_in") !== "true") {
+        window.location.href = "/";
+    }
     loadInventory();
 
     document.getElementById('productForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const category = document.getElementById('prodCategory').value;
-        const name = document.getElementById('prodName').value;
-        const uom = document.getElementById('prodUom').value;
-        
-        const chiller = parseInt(document.getElementById('stockChiller').value) || 0;
-        const commissary = parseInt(document.getElementById('stockCommissary').value) || 0;
-        const dry_stock = parseInt(document.getElementById('stockDry').value) || 0;
-        const freezer = parseInt(document.getElementById('stockFreezer').value) || 0;
-        const packaging = parseInt(document.getElementById('stockPackaging').value) || 0;
-        const scrap = parseInt(document.getElementById('stockScrap').value) || 0;
-
-        const token = localStorage.getItem("erp_session");
+        const payload = {
+            category: document.getElementById('prodCategory').value,
+            item_name: document.getElementById('prodName').value,
+            uom: document.getElementById('prodUom').value,
+            chiller: parseInt(document.getElementById('stockChiller').value) || 0,
+            commissary: parseInt(document.getElementById('stockCommissary').value) || 0,
+            dry_stock: parseInt(document.getElementById('stockDry').value) || 0,
+            freezer: parseInt(document.getElementById('stockFreezer').value) || 0,
+            packaging: parseInt(document.getElementById('stockPackaging').value) || 0,
+            scrap: parseInt(document.getElementById('stockScrap').value) || 0
+        };
 
         try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/inventory`, {
+            const response = await fetch('/api/inventory', {
                 method: "POST",
-                headers: {
-                    "apikey": SUPABASE_KEY,
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                    "Prefer": "return=minimal"
-                },
-                body: JSON.stringify({ 
-                    category, 
-                    item_name: name, 
-                    uom, 
-                    chiller, 
-                    commissary, 
-                    dry_stock, 
-                    freezer, 
-                    packaging, 
-                    scrap 
-                })
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
             });
-            if (!response.ok) throw new Error("Hindi mai-save ang aytem sa database.");
+            if (!response.ok) throw new Error("Gave error saving data.");
             
             document.getElementById('productForm').reset();
-            // I-reset sa default zero ang mga number fields pagkatapos mag-save
+            // I-reset sa zero ang numbers pagkatapos mag-save
             document.getElementById('stockChiller').value = 0;
             document.getElementById('stockCommissary').value = 0;
             document.getElementById('stockDry').value = 0;
             document.getElementById('stockFreezer').value = 0;
             document.getElementById('stockPackaging').value = 0;
             document.getElementById('stockScrap').value = 0;
-            
+
             loadInventory();
         } catch (error) {
             alert(error.message);
@@ -89,72 +54,42 @@ if (inventoryTable) {
     });
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
-        localStorage.removeItem("erp_session");
+        localStorage.removeItem("erp_logged_in");
         window.location.href = "/";
     });
 }
 
-function checkUser() {
-    const token = localStorage.getItem("erp_session");
-    if (!token) window.location.href = "/";
-}
-
 async function loadInventory() {
-    inventoryTable.innerHTML = "<tr><td colspan='12' style='text-align:center;'>Kinukuha ang pinakabagong report...</td></tr>";
-    const token = localStorage.getItem("erp_session");
+    inventoryTable.innerHTML = "<tr><td colspan='12' style='text-align:center;'>Kinukuha ang pinakabagong ulat mula sa Google Sheets...</td></tr>";
 
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/inventory?select=*&order=id.asc`, {
-            method: "GET",
-            headers: {
-                "apikey": SUPABASE_KEY,
-                "Authorization": `Bearer ${token}`
-            }
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message);
+        const response = await fetch('/api/inventory');
+        const rows = await response.json();
 
         inventoryTable.innerHTML = "";
-        if (data.length === 0) {
-            inventoryTable.innerHTML = "<tr><td colspan='12' style='text-align:center;'>Walang laman ang imbentaryo. Magsimula sa pamamagitan ng form sa itaas.</td></tr>";
+        if (rows.length === 0) {
+            inventoryTable.innerHTML = "<tr><td colspan='12' style='text-align:center;'>Walang laman ang iyong Google Sheet.</td></tr>";
             return;
         }
 
-        data.forEach((item, index) => {
-            // Awtomatikong pagkalkula ng kabuuan tulad ng formula sa Google Sheets
-            const totalQty = (item.chiller || 0) + (item.commissary || 0) + (item.dry_stock || 0) + (item.freezer || 0) + (item.packaging || 0) + (item.scrap || 0);
-
-            const row = `<tr>
+        rows.forEach((row, index) => {
+            const tr = `<tr>
                 <td>${index + 1}</td>
-                <td style='color: #38bdf8; font-weight: bold;'>${item.category || 'N/A'}</td>
-                <td><b>${item.item_name}</b></td>
-                <td>${item.uom || 'PCS'}</td>
-                <td>${item.chiller || 0}</td>
-                <td>${item.commissary || 0}</td>
-                <td>${item.dry_stock || 0}</td>
-                <td>${item.freezer || 0}</td>
-                <td>${item.packaging || 0}</td>
-                <td>${item.scrap || 0}</td>
-                <td style='background-color: #0f172a; font-weight: bold; color: #10b981;'>${totalQty}</td>
-                <td><button onclick="deleteItem(${item.id})" style="background: #ef4444; color: white; padding: 4px 8px; font-size: 11px; width: auto; margin:0; cursor:pointer; border:none; border-radius:4px;">Burahin</button></td>
+                <td><span class="category-badge">${row[0] || ''}</span></td>
+                <td><b>${row[1] || ''}</b></td>
+                <td>${row[2] || ''}</td>
+                <td>${row[3] || 0}</td>
+                <td>${row[4] || 0}</td>
+                <td>${row[5] || 0}</td>
+                <td>${row[6] || 0}</td>
+                <td>${row[7] || 0}</td>
+                <td>${row[8] || 0}</td>
+                <td class="total-cell">${row[9] || 0}</td>
+                <td><span style="color:var(--text-muted); font-size:11px;">Naka-save</span></td>
             </tr>`;
-            inventoryTable.innerHTML += row;
+            inventoryTable.innerHTML += tr;
         });
     } catch (error) {
-        inventoryTable.innerHTML = `<tr><td colspan='12' style='color:#ef4444;'>Error: ${error.message}</td></tr>`;
-    }
-}
-
-async function deleteItem(id) {
-    if (confirm("Sigurado ka bang buburahin ang item na ito sa ulat?")) {
-        const token = localStorage.getItem("erp_session");
-        await fetch(`${SUPABASE_URL}/rest/v1/inventory?id=eq.${id}`, {
-            method: "DELETE",
-            headers: {
-                "apikey": SUPABASE_KEY,
-                "Authorization": `Bearer ${token}`
-            }
-        });
-        loadInventory();
+        inventoryTable.innerHTML = `<tr><td colspan='12' style='color:var(--accent-red);'>Error sa pag-load: ${error.message}</td></tr>`;
     }
 }
